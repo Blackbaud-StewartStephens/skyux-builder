@@ -2,18 +2,26 @@
 'use strict';
 
 const runtimeUtils = require('../utils/runtime-test-utils');
+const mock = require('mock-require');
 
 describe('config webpack build public library', () => {
   const configPath = '../config/webpack/build-public-library.webpack.config';
   let skyPagesConfig;
 
   beforeEach(() => {
+    mock('ngc-webpack', {
+      NgcWebpackPlugin: function () {}
+    });
     skyPagesConfig = {
       skyux: {
         mode: 'advanced'
       },
       runtime: runtimeUtils.getDefaultRuntime()
     };
+  });
+
+  afterEach(() => {
+    mock.stopAll();
   });
 
   it('should expose a getWebpackConfig method', () => {
