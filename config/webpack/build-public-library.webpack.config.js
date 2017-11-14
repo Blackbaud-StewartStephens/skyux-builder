@@ -47,7 +47,7 @@ function getWebpackConfig(skyPagesConfig) {
     },
     plugins: [
       new ngcWebpack.NgcWebpackPlugin({
-        tsConfig: skyPagesConfigUtil.spaPathTemp('tsconfig.json')
+        tsConfigPath: skyPagesConfigUtil.spaPathTemp('tsconfig.json')
       }),
 
       new webpack.optimize.UglifyJsPlugin({

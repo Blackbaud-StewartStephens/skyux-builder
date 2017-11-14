@@ -69,7 +69,8 @@ function getWebpackConfig(skyPagesConfig, argv = {}) {
       extensions: [
         '.js',
         '.ts'
-      ]
+      ],
+      symlinks: false
     },
     module: {
       rules: [
