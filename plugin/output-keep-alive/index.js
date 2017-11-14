@@ -1,6 +1,15 @@
 /*jslint node: true */
 'use strict';
 
+const fs = require('fs');
+
+// process.stdout.write is asynchronous and can cause excessive memory drain
+// when used in a loop. This solution will make stdout synchronous.
+// Inspired by: https://github.com/litmit/console-sync
+function writeSync(message) {
+  fs.writeSync(process.stdout.fd, message);
+}
+
 /**
  * For longer builds, this plugin periodically prints to the
  * console to reset any timeouts associated with watched output.
@@ -20,7 +29,7 @@ function OutputKeepAlivePlugin(options = {}) {
       // More hooks found on the docs:
       // https://webpack.js.org/api/compilation/
       compilation.plugin('build-module', function () {
-        process.stdout.write('.');
+        writeSync('.');
       });
     });
   };
