@@ -47,6 +47,7 @@ describe('AppComponent', () => {
   let scrollCalled: boolean = false;
   let skyAppConfig: any;
   let viewport: SkyAppViewportService;
+  let spyOmnibarDestroy: any;
 
   class MockHelpInitService {
     public load() { }
@@ -187,6 +188,7 @@ describe('AppComponent', () => {
           base: 'app-base'
         },
         params: {
+          get: (key: any) => false,
           has: (key: any) => false,
           hasAllRequiredParams: () => true,
           parse: (p: any) => parseParams = p
@@ -201,6 +203,11 @@ describe('AppComponent', () => {
     scrollCalled = false;
     viewport = new SkyAppViewportService();
     navigateByUrlParams = undefined;
+    spyOmnibarDestroy = spyOn(BBOmnibar, 'destroy');
+  });
+
+  afterEach(() => {
+    fixture.destroy();
   });
 
   it('should create component', async(() => {
@@ -234,8 +241,10 @@ describe('AppComponent', () => {
 
     setup(skyAppConfig).then(() => {
       fixture.detectChanges();
+      fixture.destroy();
       expect(spyOmnibar).not.toHaveBeenCalled();
       expect(spyOmnibarLegacy).not.toHaveBeenCalled();
+      expect(spyOmnibarDestroy).not.toHaveBeenCalled();
     });
   }));
 
@@ -350,6 +359,33 @@ describe('AppComponent', () => {
     })
   );
 
+  it('should call omnibar destroy if it was loaded', () => {
+    let spyOmnibarLoad = spyOn(BBOmnibar, 'load');
+
+    skyAppConfig.skyux.omnibar = {
+      experimental: true
+    };
+
+    setup(skyAppConfig).then(() => {
+      fixture.detectChanges();
+      fixture.destroy();
+      expect(spyOmnibarLoad).toHaveBeenCalled();
+      expect(spyOmnibarDestroy).toHaveBeenCalled();
+    });
+  });
+
+  it('should not load the omnibar if the addin param is 1', () => {
+    let spyOmnibar = spyOn(BBOmnibar, 'load');
+
+    skyAppConfig.runtime.params.get = (key: string) => key === 'addin' ? '1' : undefined;
+    skyAppConfig.skyux.omnibar = true;
+
+    setup(skyAppConfig).then(() => {
+      fixture.detectChanges();
+      expect(spyOmnibar).not.toHaveBeenCalled();
+    });
+  });
+
   it('should set the onSearch property if a search provider is provided', async(() => {
     let spyOmnibar = spyOn(BBOmnibar, 'load');
 
@@ -409,7 +445,7 @@ describe('AppComponent', () => {
       experimental: true
     };
 
-    skyAppConfig.skyux.params = ['envid', 'svcid'];
+    skyAppConfig.skyux.params = ['envid', 'svcid', 'leid'];
     skyAppConfig.runtime.params.has = (key: any) => true;
     skyAppConfig.runtime.params.get = (key: any) => key + 'Value';
     setup(skyAppConfig, true).then(() => {
@@ -420,6 +456,9 @@ describe('AppComponent', () => {
 
       // Notice svcid => svcId
       expect(spyOmnibar.calls.first().args[0].svcId).toEqual('svcidValue');
+
+      // Notice svcid => svcId
+      expect(spyOmnibar.calls.first().args[0].leId).toEqual('leidValue');
     });
   }));
 
@@ -803,17 +842,6 @@ describe('AppComponent', () => {
     setup(skyAppConfig, false, Promise.resolve(result)).then(() => {
       expect(comp.isReady).toEqual(true);
       expect(console.log).toHaveBeenCalledWith(result.error.message);
-    });
-  }));
-
-  it('should redirect if all required params are not defined', async(() => {
-    skyAppConfig.runtime.params.hasAllRequiredParams = () => false;
-
-    setup(skyAppConfig).then(() => {
-      fixture.detectChanges();
-      fixture.whenStable().then(() => {
-        expect(mockWindow.nativeWindow.location.href).toBe('https://host.nxt.blackbaud.com/errors/notfound');
-      });
     });
   }));
 

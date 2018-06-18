@@ -1,3 +1,46 @@
+# 1.17.0 (2018-06-14)
+
+- Updated `auth-client` to `2.7.0` which supports omnibar theming. [#412](https://github.com/blackbaud/skyux-builder/pull/412)
+
+# 1.16.0 (2018-05-31)
+
+- Updated `auth-client` to `2.6.0` to support passing `leid` to the omnibar, to automatically include `leid` in `SkyAuthHttp` requests, and to add an `leid` flag for `skyux serve` that adds a legal entity ID to the Host URL. [#406](https://github.com/blackbaud/skyux-builder/pull/406)
+
+# 1.15.0 (2018-05-11)
+
+- Bugfix to properly fail `skyux e2e` if build step fails. [#404](https://github.com/blackbaud/skyux-builder/pull/404)
+- Updated `skyAppLink` directive to not include parameters whose current values match their default values. [#402](https://github.com/blackbaud/skyux-builder/pull/402)
+- Upgraded `auth-client` to `2.5.0`. [#407](https://github.com/blackbaud/skyux-builder/pull/407)
+- Upgraded `skyux-lib-help` to `1.3.0`. [#401](https://github.com/blackbaud/skyux-builder/pull/401), [#405](https://github.com/blackbaud/skyux-builder/pull/405)
+
+# 1.14.0 (2018-04-19)
+
+- SKY UX libraries can now define their own locale files for localizing strings.  [#379](https://github.com/blackbaud/skyux-builder/pull/379)
+
+- Changed the Webpack source map devtool from `cheap-module-eval-source-map` to `source-map`.  This fixes source maps in Firefox.  [#384](https://github.com/blackbaud/skyux-builder/pull/384)
+
+- Added the ability to resolve a missing environment ID context before rendering the application.  For instance, if the `envid` parameter is required by your application, but none is supplied either through the query string or the SPA's `skyuxconfig.json` file, the user will be presented with a screen to select an environment. If the user is only in one environment, the application will automatically be reloaded with that environment.  [#399](https://github.com/blackbaud/skyux-builder/pull/399)
+
+To opt into this new behavior, simply add the following to your `skyuxconfig.json` file (or merge it with your existing `params` section if it already exists):
+
+```
+"params": {
+  "envid": {
+    "required": true
+  }
+}
+```
+
+# 1.13.0 (2018-04-13)
+
+- Added support for the `addin` parameter.  [#396](https://github.com/blackbaud/skyux-builder/pull/396)
+- Added support for JSON files when using `require`. [#395](https://github.com/blackbaud/skyux-builder/pull/395)
+- Bugfix to properly encode and decode parameters. [#394](https://github.com/blackbaud/skyux-builder/pull/394)
+- Bugfix to prevent new instances of the omnibar when HMR is enabled. [#393](https://github.com/blackbaud/skyux-builder/pull/393) Thanks [@Blackbaud-MitchellThomas](https://github.com/Blackbaud-MitchellThomas)!
+- Bugfix to make `skyAppLink` respect the `queryParams` attribute. [#390](https://github.com/blackbaud/skyux-builder/pull/390) Thanks [@Blackbaud-MitchellThomas](https://github.com/Blackbaud-MitchellThomas)!
+- Bugfix in `toHaveText` test method. [#392](https://github.com/blackbaud/skyux-builder/pull/392)
+- Exposed `SkyAppRuntimeModule` through `@blackbaud/skyux-builder/runtime`. [#391](https://github.com/blackbaud/skyux-builder/pull/391)
+
 # 1.12.0 (2018-03-30)
 
 - Made `skyux test` more efficient by checking for spec files before initializing. [#381](https://github.com/blackbaud/skyux-builder/pull/381)
@@ -333,7 +376,7 @@
 # 1.0.0-beta.14 (2017-03-22)
 
 - Merging `skyuxconfig.{current-skyux-command}.json`, if it exists, into the `skyuxconfig.json` file.  For example, `skyuxconfig.serve.json`.
-- Adding `--envid` and `--svcid` to be specificed via the CLI and added to the Host URL opened when running `skyux serve`.  For example, `skyux serve --envid 1234`
+- Adding `--envid` and `--svcid` to be specified via the CLI and added to the Host URL opened when running `skyux serve`.  For example, `skyux serve --envid 1234`
 - SKY UX styles are now loaded when running unit tests so CSS rules defined in SKY UX take effect during tests. This allows you to check the the expected computed style of an element when using things like the HTML `hidden` property that only take effect when SKY UX styles are loaded.
 
 # 1.0.0-beta.13 (2017-03-06)

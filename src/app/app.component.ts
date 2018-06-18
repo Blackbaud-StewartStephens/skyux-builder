@@ -1,6 +1,7 @@
 import {
   Component,
   NgZone,
+  OnDestroy,
   OnInit,
   Optional
 } from '@angular/core';
@@ -32,6 +33,8 @@ import {
 
 require('style-loader!@blackbaud/skyux/dist/css/sky.css');
 require('style-loader!./app.component.scss');
+
+let omnibarLoaded: boolean;
 
 function fixUpUrl(baseUrl: string, route: string, config: SkyAppConfig) {
   return config.runtime.params.getUrl(baseUrl + route);
@@ -75,7 +78,7 @@ function fixUpNav(nav: any, baseUrl: string, config: SkyAppConfig) {
   selector: 'sky-pages-app',
   templateUrl: './app.component.html'
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
   public isReady = false;
 
   constructor(
@@ -118,19 +121,30 @@ export class AppComponent implements OnInit {
         }
       }
     });
-
     this.initShellComponents();
+  }
+
+  public ngOnDestroy() {
+    if (omnibarLoaded) {
+      BBOmnibar.destroy();
+      omnibarLoaded = false;
+    }
   }
 
   // Only pass params that omnibar config cares about
   // Internally we store as envid/svcid but auth-client wants envId/svcId
   private setParamsFromQS(omnibarConfig: any) {
-    if (this.config.runtime.params.has('envid')) {
-      omnibarConfig.envId = this.config.runtime.params.get('envid');
-    }
-    if (this.config.runtime.params.has('svcid')) {
-      omnibarConfig.svcId = this.config.runtime.params.get('svcid');
-    }
+    const map: { [key: string]: string } = {
+      envid: 'envId',
+      leid: 'leId',
+      svcid: 'svcId'
+    };
+
+    Object.keys(map).forEach((key: string) => {
+      if (this.config.runtime.params.has(key)) {
+        omnibarConfig[map[key]] = this.config.runtime.params.get(key);
+      }
+    });
   }
 
   private setOnSearch(omnibarConfig: any) {
@@ -251,15 +265,11 @@ export class AppComponent implements OnInit {
         } else {
           BBOmnibarLegacy.load(omnibarConfig);
         }
+        omnibarLoaded = true;
       });
     };
 
-    if (!this.config.runtime.params.hasAllRequiredParams()) {
-      this.windowRef.nativeWindow.location.href = 'https://host.nxt.blackbaud.com/errors/notfound';
-      return;
-    }
-
-    if (omnibarConfig) {
+    if (omnibarConfig && this.config.runtime.params.get('addin') !== '1') {
       if (this.omnibarProvider) {
         this.omnibarProvider.ready().then(loadOmnibar);
       } else {
