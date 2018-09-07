@@ -1,3 +1,61 @@
+# 1.20.2 (2018-09-06)
+
+- Replaced the expired local server certificate used with the `skyux serve` and `skyux e2e` commands. [#467](https://github.com/blackbaud/skyux-builder/pull/467)
+
+# 1.20.1 (2018-09-06)
+
+ - Disabled the `aria-allowed-attr` rule in aXe a11y testing. This will be re-enabled when we can update to `axe-core` version `3.1.1`. [#465](https://github.com/blackbaud/skyux-builder/pull/465)
+
+# 1.20.0 (2018-08-30)
+
+**Note** Updating to this version of SKY UX Builder requires that SKY UX also be updated to 2.21.0 because it takes advantages of new features in SKY UX.
+
+- Minor tweaks to code coverage instrumentation for SKY UX libraries. [#457](https://github.com/blackbaud/skyux-builder/pull/457)
+- CSS imports now reference the new `@skyux/theme` library that is part of the latest version of SKY UX 2. [#458](https://github.com/blackbaud/skyux-builder/pull/458)
+- Added the ability to specify a `browserSet` for e2e tests similar to the option that exists for unit tests.  Currently the only supported `browserSet` value is `speedy`. [#459](https://github.com/blackbaud/skyux-builder/pull/459)
+- Addressed a minor issue when logging build status. [#460](https://github.com/blackbaud/skyux-builder/pull/460)
+- SPAs can now force a legal entity context and allow users to pick a legal entity from a list if the user belongs to more than one legal entity, or to automatically select a default legal entity if the user only belongs to one legal entity. To use this feature, ensure that the `parameters` section of `skyuxconfig.json` specifies `leid` as a required parameter. [#461](https://github.com/blackbaud/skyux-builder/pull/461) Example:
+
+```
+"params": {
+  "leid": {
+    "required": true
+  }
+}
+```
+
+- Updated `@blackbaud/auth-client` package to reflect a change in policy for changing BBID user session timeouts from 15 minutes of inactivity to 90 minutes. [#462](https://github.com/blackbaud/skyux-builder/pull/462)
+
+# 1.19.3 (2018-08-16)
+
+- Bugfix to allow SPAs to reference resource files in libraries even if the SPAs do not include resource files. [#449](https://github.com/blackbaud/skyux-builder/pull/449)
+- Bugfix to catch JavaScript errors in browsers during unit tests. [#452](https://github.com/blackbaud/skyux-builder/pull/452)
+
+# 1.19.2 (2018-08-02)
+
+- Reverted stricter type information for `SkyPactService`. [#446](https://github.com/blackbaud/skyux-builder/pull/446)
+- Bugfix for `skyux build-public-library` command to successfully run on Windows. [#445](https://github.com/blackbaud/skyux-builder/pull/445)
+
+# 1.19.1 (2018-07-23)
+
+- Bugfix to allow component libraries to properly consume external components. [#439](https://github.com/blackbaud/skyux-builder/pull/439)
+
+# 1.19.0 (2018-07-18)
+
+- Updated the `skyux build-public-library` command to use same compiler as `skyux build`. [#417](https://github.com/blackbaud/skyux-builder/pull/417)
+- Added better type info and documentation to `SkyPactService`. [#430](https://github.com/blackbaud/skyux-builder/pull/430) Thanks [@Blackbaud-KrisMahon](https://github.com/Blackbaud-KrisMahon)!
+- Exposed `skyuxconfig.json` to `skyux test` and `skyux e2e` configuration files. [#431](https://github.com/blackbaud/skyux-builder/pull/431)
+- Created the `$schema` property in `skyuxconfig.json` to allow for better IDE intergration.  The value of `./node_modules/@blackbaud/skyux-builder/skyuxconfig-schema.json`is applied to the default template and can be retroactively added to older SPAs. [#358](https://github.com/blackbaud/skyux-builder/pull/358)
+- Created the `browserSet` property in `skyuxconfig.json` to control which browsers to use during testing.  Applicable values are `speedy`, `quirky`, and `paranoid`. [#431](https://github.com/blackbaud/skyux-builder/pull/431)
+- Created the `excludeFromRequest` property in `skyuxconfig.json` to exlude parameters from requests. [#432](https://github.com/blackbaud/skyux-builder/pull/432)
+
+# 1.18.0 (2018-06-21)
+
+- Added LCOV code coverage output when running `skyux test`. [#416](https://github.com/blackbaud/skyux-builder/pull/416)
+- Added support to use tildes for imports in SCSS files in libraries. [#415](https://github.com/blackbaud/skyux-builder/pull/415)
+- Added support for route navigation during `skyux e2e`. [#414](https://github.com/blackbaud/skyux-builder/pull/414)
+- Bugfix to properly handle multiline entry of `styleUrls`. [#418](https://github.com/blackbaud/skyux-builder/pull/418)
+
 # 1.17.0 (2018-06-14)
 
 - Updated `auth-client` to `2.7.0` which supports omnibar theming. [#412](https://github.com/blackbaud/skyux-builder/pull/412)
@@ -225,7 +283,7 @@ To opt into this new behavior, simply add the following to your `skyuxconfig.jso
 
 - Bugfix to allow `redirects` property in `skyuxconfig.json`. [#224](https://github.com/blackbaud/skyux-builder/pull/224)
 - Bugfix that caused plugins to process files twice during AOT compilation.  [#225](https://github.com/blackbaud/skyux-builder/pull/225)
-- Implemented a better caching strategy and fallback to non-region-specific languages.  [#226](https://github.com/blackbaud/skyux-builder/pull/226) 
+- Implemented a better caching strategy and fallback to non-region-specific languages.  [#226](https://github.com/blackbaud/skyux-builder/pull/226)
 - Upgraded `@blackbaud/auth-client` to 1.9.1. [#227](https://github.com/blackbaud/skyux-builder/pull/227)
 
 # 1.0.0-rc.7 (2017-07-13)
@@ -239,7 +297,7 @@ To opt into this new behavior, simply add the following to your `skyuxconfig.jso
 # 1.0.0-rc.6 (2017-07-05)
 
   - Updated the auth client library to pick up logic for showing the search button based on whether search has been implemented by the SPA author. [#214](https://github.com/blackbaud/skyux-builder/pull/214)
-  
+
 # 1.0.0-rc.5 (2017-07-03)
 
   - Added web-animations polyfill to support Angular animations in more browsers. [#204](https://github.com/blackbaud/skyux-builder/pull/204)
@@ -269,7 +327,7 @@ To opt into this new behavior, simply add the following to your `skyuxconfig.jso
 
 # 1.0.0-rc.0 (2017-06-16)
 
-- Added support for Angular v4.1.3 and SKY UX 2.0.0-rc.0. 
+- Added support for Angular v4.1.3 and SKY UX 2.0.0-rc.0.
 
 # 1.0.0-beta.33 (2017-06-15)
 

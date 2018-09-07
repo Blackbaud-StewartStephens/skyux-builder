@@ -1,13 +1,13 @@
 /*jshint node: true*/
 'use strict';
 
+const spawn = require('cross-spawn');
 const fs = require('fs-extra');
 const rimraf = require('rimraf');
 const logger = require('@blackbaud/skyux-logger');
 
 const stageTypeScriptFiles = require('./utils/stage-library-ts');
 const preparePackage = require('./utils/prepare-library-package');
-const webpackConfig = require('../config/webpack/build-public-library.webpack.config.js');
 const skyPagesConfigUtil = require('../config/sky-pages/sky-pages.config');
 const runCompiler = require('./utils/run-compiler');
 const tsLinter = require('./utils/ts-linter');
@@ -70,6 +70,9 @@ function writeTSConfig() {
       'paths': {
         '@blackbaud/skyux-builder/*': [
           '*'
+        ],
+        '.skypageslocales/*': [
+          '../src/assets/locales/*'
         ]
       }
     },
@@ -81,9 +84,63 @@ function writeTSConfig() {
   fs.writeJSONSync(skyPagesConfigUtil.spaPathTemp('tsconfig.json'), config);
 }
 
-function transpile(skyPagesConfig, webpack) {
+/**
+ * Create a "placeholder" module for Angular AoT compiler.
+ * This is needed to avoid breaking changes; in the future,
+ * we should require a module name be provided by the consumer.
+ */
+function writePlaceholderModule() {
+  const content = `import { NgModule } from '@angular/core';
+export * from './index';
+@NgModule({})
+export class SkyLibPlaceholderModule {}
+`;
+
+  fs.writeFileSync(skyPagesConfigUtil.spaPathTemp('main.ts'), content, {
+    encoding: 'utf8'
+  });
+}
+
+/**
+ * Creates a UMD JavaScript bundle.
+ * @param {*} skyPagesConfig
+ * @param {*} webpack
+ */
+function createBundle(skyPagesConfig, webpack) {
+  const webpackConfig = require('../config/webpack/build-public-library.webpack.config');
   const config = webpackConfig.getWebpackConfig(skyPagesConfig);
   return runCompiler(webpack, config);
+}
+
+/**
+ * Transpiles TypeScript files into JavaScript files
+ * to be included with the NPM package.
+ */
+function transpile() {
+  return new Promise((resolve, reject) => {
+    const result = spawn.sync(
+      skyPagesConfigUtil.spaPath('node_modules', '.bin', 'ngc'),
+      [
+        '--project',
+        skyPagesConfigUtil.spaPathTemp('tsconfig.json')
+      ],
+      { stdio: 'inherit' }
+    );
+
+    // Catch ngc errors.
+    if (result.err) {
+      reject(result.err);
+      return;
+    }
+
+    // Catch non-zero status codes.
+    if (result.status !== 0) {
+      reject(new Error(`Angular compiler (ngc) exited with status code ${result.status}.`));
+      return;
+    }
+
+    resolve();
+  });
 }
 
 module.exports = (skyPagesConfig, webpack) => {
@@ -91,18 +148,20 @@ module.exports = (skyPagesConfig, webpack) => {
   cleanAll();
   stageTypeScriptFiles();
   writeTSConfig();
+  writePlaceholderModule();
   copyRuntime();
 
-  return transpile(skyPagesConfig, webpack)
-      .then(() => {
-        cleanRuntime();
-        preparePackage();
-        cleanTemp();
-        process.exit(0);
-      })
-      .catch((err) => {
-        cleanAll();
-        logger.error(err);
-        process.exit(1);
-      });
+  return createBundle(skyPagesConfig, webpack)
+    .then(() => transpile())
+    .then(() => {
+      cleanRuntime();
+      preparePackage();
+      cleanTemp();
+      process.exit(0);
+    })
+    .catch((err) => {
+      cleanAll();
+      logger.error(err);
+      process.exit(1);
+    });
 };

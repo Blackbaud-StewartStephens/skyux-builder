@@ -9,6 +9,7 @@ describe('config webpack build public library', () => {
   const configPath = '../config/webpack/build-public-library.webpack.config';
 
   let mockFs;
+  let mockNgTools;
   let skyPagesConfig;
 
   beforeEach(() => {
@@ -16,6 +17,10 @@ describe('config webpack build public library', () => {
       readJsonSync() {
         return {};
       }
+    };
+
+    mockNgTools = {
+      AotPlugin: function () {}
     };
 
     skyPagesConfig = {
@@ -26,7 +31,9 @@ describe('config webpack build public library', () => {
     };
 
     mock('../config/sky-pages/sky-pages.config', {
-      spaPathTemp() {},
+      spaPathTemp() {
+        return 'temp';
+      },
       spaPath() {
         return 'spa';
       },
@@ -36,6 +43,7 @@ describe('config webpack build public library', () => {
     });
 
     mock('fs-extra', mockFs);
+    mock('@ngtools/webpack', mockNgTools);
   });
 
   afterEach(() => {
@@ -74,6 +82,9 @@ describe('config webpack build public library', () => {
             '@angular/common': '4.3.6',
             '@pact-foundation/pact-web': '5.3.0',
             'zone.js': '0.8.10'
+          },
+          peerDependencies: {
+            '@angular/core': '4.3.6'
           }
         };
       }
@@ -82,6 +93,9 @@ describe('config webpack build public library', () => {
         dependencies: {
           '@blackbaud/skyux': '2.13.0',
           '@blackbaud-internal/skyux-lib-testing': 'latest'
+        },
+        peerDependencies: {
+          '@angular/core': '4.3.6'
         }
       };
     });
@@ -91,6 +105,7 @@ describe('config webpack build public library', () => {
       /^@angular\/common/,
       /^@pact\-foundation\/pact\-web/,
       /^zone\.js/,
+      /^@angular\/core/,
       /^@blackbaud\/skyux/,
       /^@blackbaud\-internal\/skyux\-lib\-testing/
     ]);
@@ -100,5 +115,18 @@ describe('config webpack build public library', () => {
     const lib = mock.reRequire(configPath);
     const config = lib.getWebpackConfig(skyPagesConfig);
     expect(config.externals).toEqual([]);
+  });
+
+  it('should setup AOT compilation', () => {
+    const lib = mock.reRequire(configPath);
+    const spy = spyOn(mockNgTools, 'AotPlugin').and.callThrough();
+
+    lib.getWebpackConfig(skyPagesConfig);
+
+    expect(spy).toHaveBeenCalledWith({
+      tsConfigPath: 'temp',
+      entryModule: 'temp#SkyLibPlaceholderModule',
+      sourceMap: true
+    });
   });
 });

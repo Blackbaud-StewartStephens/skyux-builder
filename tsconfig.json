@@ -18,14 +18,16 @@
     "types": [
       "core-js",
       "node",
-      "jasmine",
-      "fontfaceobserver"
+      "jasmine"
     ],
     "baseUrl": ".",
     "paths": {
       "@blackbaud/skyux-builder/*": [
         "./node_modules/@blackbaud/skyux-builder/*",
         "./*"
+      ],
+      ".skypageslocales/*": [
+        ".skypageslocales/*"
       ]
     }
   },

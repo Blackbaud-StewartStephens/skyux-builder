@@ -31,7 +31,7 @@ import {
   SkyAppWindowRef
 } from '@blackbaud/skyux-builder/runtime';
 
-require('style-loader!@blackbaud/skyux/dist/css/sky.css');
+require('style-loader!@skyux/theme/css/sky.css');
 require('style-loader!./app.component.scss');
 
 let omnibarLoaded: boolean;
@@ -268,6 +268,14 @@ export class AppComponent implements OnInit, OnDestroy {
         omnibarLoaded = true;
       });
     };
+
+    if (this.config.runtime.command === 'e2e') {
+      this.windowRef.nativeWindow.addEventListener('message', (event: MessageEvent) => {
+        if (event.data.messageType === 'sky-navigate-e2e') {
+          this.router.navigate(event.data.url);
+        }
+      });
+    }
 
     if (omnibarConfig && this.config.runtime.params.get('addin') !== '1') {
       if (this.omnibarProvider) {
