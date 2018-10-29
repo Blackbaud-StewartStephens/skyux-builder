@@ -43,6 +43,19 @@ function cleanRuntime() {
   rimraf.sync(skyPagesConfigUtil.spaPath('dist', 'runtime'));
 }
 
+function getEntryPointFiles() {
+  const files = [
+    skyPagesConfigUtil.spaPathTemp('index.ts')
+  ];
+
+  const testingPath = skyPagesConfigUtil.spaPathTemp('testing', 'index.ts');
+  if (fs.existsSync(testingPath)) {
+    files.push(testingPath);
+  }
+
+  return files;
+}
+
 function writeTSConfig() {
   var config = {
     'compilerOptions': {
@@ -76,9 +89,7 @@ function writeTSConfig() {
         ]
       }
     },
-    'files': [
-      skyPagesConfigUtil.spaPathTemp('index.ts')
-    ]
+    'files': getEntryPointFiles()
   };
 
   fs.writeJSONSync(skyPagesConfigUtil.spaPathTemp('tsconfig.json'), config);
@@ -99,6 +110,14 @@ export class SkyLibPlaceholderModule {}
   fs.writeFileSync(skyPagesConfigUtil.spaPathTemp('main.ts'), content, {
     encoding: 'utf8'
   });
+}
+
+function processFiles(skyPagesConfig) {
+  const pluginFileProcessor = require('../lib/plugin-file-processor');
+  pluginFileProcessor.processFiles(
+    skyPagesConfig,
+    skyPagesConfigUtil.spaPathTemp('**', '*.*')
+  );
 }
 
 /**
@@ -150,6 +169,7 @@ module.exports = (skyPagesConfig, webpack) => {
   writeTSConfig();
   writePlaceholderModule();
   copyRuntime();
+  processFiles(skyPagesConfig);
 
   return createBundle(skyPagesConfig, webpack)
     .then(() => transpile())

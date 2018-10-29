@@ -1,3 +1,44 @@
+# 1.26.1 (2018-10-24)
+
+- Fixed issue with using Builder when `strictNullChecks` is enabled. [#487](https://github.com/blackbaud/skyux-builder/pull/487) Thanks [@bentefay](https://github.com/bentefay)!
+
+
+# 1.26.0 (2018-10-19)
+
+- Updated `skyux e2e` to automatically install appropriate ChromeDriver version for the installed version of Chrome. Previous functionality was to always install the latest version, which caused version mismatches.
+- Added support for developing builder on Node 8.
+
+# 1.25.0 (2018-10-17)
+
+- Added support for `@skyux/i18n@3.2.0`. [#486](https://github.com/blackbaud/skyux-builder/pull/486)
+- Fixed bootstrapper to allow for TypeScript strict mode. [#464](https://github.com/blackbaud/skyux-builder/pull/464)
+
+# 1.24.0 (2018-10-01)
+
+- Updated auth-client library to pick up change that displays the omnibar inactivity prompt at a z-index high enough to display over SKY UX modals. [#481](https://github.com/blackbaud/skyux-builder/pull/481)
+
+# 1.23.2 (2018-09-27)
+
+- Bugfix to address endless loop when running `skyux watch`. [#479](https://github.com/blackbaud/skyux-builder/pull/479)
+
+# 1.23.1 (2018-09-24)
+
+- Bugfix to re-add `SkyAuthHttp` to primary module's providers. [#476](https://github.com/blackbaud/skyux-builder/pull/476)
+
+# 1.23.0 (2018-09-24)
+
+- Fixed help widget to not display when SPA is in add-in mode. [#475](https://github.com/blackbaud/skyux-builder/pull/475)
+- Fixed library bundler to also transpile source files located in the root public directory. [#474](https://github.com/blackbaud/skyux-builder/pull/474)
+
+# 1.22.0 (2018-09-19)
+
+- Added support for libraries to include an isolated "testing" module. [#471](https://github.com/blackbaud/skyux-builder/pull/471)
+- Upgraded `skyux-lib-help` to `1.3.1`. [#473](https://github.com/blackbaud/skyux-builder/pull/473)
+
+# 1.21.0 (2018-09-13)
+
+- Added preload hook to the `skyux build-public-library` command to let plugins modify library files. [#469](https://github.com/blackbaud/skyux-builder/pull/469)
+
 # 1.20.2 (2018-09-06)
 
 - Replaced the expired local server certificate used with the `skyux serve` and `skyux e2e` commands. [#467](https://github.com/blackbaud/skyux-builder/pull/467)
